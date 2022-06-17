@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ManageBooks"
+version = "0.1.0"
+description = ""
+authors = ["Michael233ctrl <mikhail.bessarabenko@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+uvicorn = {extras = ["standard"], version = "^0.17.6"}
+fastapi = "^0.78.0"
+SQLAlchemy = "^1.4.37"
+psycopg2-binary = "^2.9.3"
+alembic = "^1.8.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
