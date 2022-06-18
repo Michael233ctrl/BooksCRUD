@@ -1,1 +1,1 @@
-from db.base_class import Base
+from .base_class import Base
