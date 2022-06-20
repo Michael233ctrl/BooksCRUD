@@ -7,6 +7,7 @@ class BookBase(BaseModel):
     publisher: str
     author: str
     pages: str
+    tags: list = []
 
 
 class BookCreate(BookBase):

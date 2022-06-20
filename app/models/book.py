@@ -1,5 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.dialects.postgresql import ARRAY
+
 from db.base import Base
 
 
@@ -11,5 +13,6 @@ class Book(Base):
     publisher = Column(String, index=True, nullable=False)
     author = Column(String, nullable=False)
     pages = Column(String)
+    tags = Column(ARRAY(String))
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.utcnow, default=datetime.utcnow)
