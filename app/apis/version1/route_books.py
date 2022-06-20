@@ -2,10 +2,12 @@ from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
 
 import schemas
+from apis.version1.route_login import get_token
 from crud import crud_books
 from db.session import get_db
 
-router = APIRouter()
+
+router = APIRouter(dependencies=[Depends(get_token)])
 
 
 @router.get("/", response_model=list[schemas.Book])
