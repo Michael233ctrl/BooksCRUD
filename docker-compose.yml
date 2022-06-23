@@ -1,14 +1,23 @@
 version: "3.7"
 
 services:
+  web:
+    build: .
+    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/manage_books
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
   db:
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: books_db
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

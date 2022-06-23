@@ -2,10 +2,9 @@ from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
 
 import schemas
-from apis.version1.route_login import get_token
+from api.version1.route_login import get_token
 from crud import crud_books
 from db.session import get_db
-
 
 router = APIRouter(dependencies=[Depends(get_token)])
 
@@ -23,7 +22,7 @@ def read_books_by_id(book_id: int, db: Session = Depends(get_db)):
     return db_book
 
 
-@router.post("/", response_model=schemas.Book)
+@router.post("/", response_model=schemas.Book, status_code=201)
 def create_books(book: schemas.BookCreate, db: Session = Depends(get_db)):
     return crud_books.create_book(db, book)
 
