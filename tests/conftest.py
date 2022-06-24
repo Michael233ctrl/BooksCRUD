@@ -12,9 +12,7 @@ from db.base import Base
 from db.session import get_db
 from tests.utils.user import user_authentication_headers, create_dummy_user
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@db/test_books_db"
-
-# SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
+SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)

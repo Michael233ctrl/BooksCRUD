@@ -3,11 +3,6 @@ from fastapi import FastAPI
 from db.session import engine
 from db.base import Base
 
-Base.metadata.create_all(engine)
-
-# app = FastAPI()
-# app.include_router(api_router)
-
 
 def include_router(app):
     app.include_router(api_router)

@@ -8,6 +8,8 @@ services:
       - .:/manage_books
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - db
   db:
@@ -15,11 +17,11 @@ services:
     ports:
       - ${POSTGRES_PORT}:5432
     environment:
+      - POSTGRES_MULTIPLE_DATABASES="${POSTGRES_DB}","${TEST_POSTGRES_DB}"
       - POSTGRES_USER
       - POSTGRES_PASSWORD
-      - POSTGRES_DB
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+      - ./create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
 volumes:
   postgres_data:
