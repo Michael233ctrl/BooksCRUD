@@ -10,6 +10,7 @@ from api.base import api_router
 from core.config import settings
 from db.base import Base
 from db.session import get_db
+from tests.utils.book import create_book
 from tests.utils.user import user_authentication_headers, create_dummy_user
 
 SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
@@ -46,6 +47,7 @@ def db_session(app: FastAPI) -> Generator[TestingSessionLocal, Any, None]:
 @pytest.fixture(scope="module")
 def client(app: FastAPI, db_session: TestingSessionLocal) -> Generator[TestClient, Any, None]:
     app.dependency_overrides[get_db] = lambda: db_session
+    create_book(db_session)
     with TestClient(app) as client:
         yield client
 

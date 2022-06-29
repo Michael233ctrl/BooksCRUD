@@ -24,3 +24,4 @@ def create_dummy_user(db_session) -> User:
     db_session.commit()
     db_session.refresh(user)
     return user
+

@@ -3,20 +3,8 @@ from fastapi import FastAPI
 from db.session import engine
 from db.base import Base
 
+app = FastAPI()
 
-def include_router(app):
-    app.include_router(api_router)
+Base.metadata.create_all(bind=engine)
 
-
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
-
-def start_application():
-    app = FastAPI()
-    include_router(app)
-    create_tables()
-    return app
-
-
-app = start_application()
+app.include_router(api_router)

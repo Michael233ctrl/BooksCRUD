@@ -1,4 +1,5 @@
 from core.hashing import Hasher
+from errors.app_error import UserNotFoundError
 from models.user import User
 from schemas.user import UserCreate
 from sqlalchemy.orm import Session
@@ -22,9 +23,8 @@ def get_users(db: Session):
     return db.query(User).all()
 
 
-def get_user_by_email(email: str, db: Session):
-    return db.query(User).filter(User.email == email).first()
-
-
 def get_user(username: str, db: Session):
-    return db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise UserNotFoundError()
+    return user
