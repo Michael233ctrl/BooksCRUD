@@ -1,48 +1,76 @@
 from sqlalchemy import update
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
-from errors.app_error import BookNotFoundError, BookAlreadyExistError
+from crud.crud_tags import get_or_create_tag
 from models.book import Book
-import schemas
+from schemas.book import BookCreate
 
 
-def get_books(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Book).offset(skip).limit(limit).all()
+def get_books(db: Session):
+    return db.query(Book).options(joinedload(Book.tags)).all()
 
 
 def get_book_by_id(db: Session, book_id: int):
-    db_book = db.query(Book).filter(Book.id == book_id).first()
-    if db_book is None:
-        raise BookNotFoundError()
+    return (
+        db.query(Book)
+        .options(joinedload(Book.tags))
+        .where(Book.id == book_id)
+        .one_or_none()
+    )
+
+
+def get_book_by_title(db: Session, title: str):
+    return db.query(Book).where(Book.title == title).first()
+
+
+def create_book(db: Session, book: BookCreate):
+    check_book = get_book_by_title(db, book.title)
+    if check_book is not None:
+        return None
+
+    tags = [get_or_create_tag(db, tag.name) for tag in book.tags]
+    db_book = Book(
+        title=book.title,
+        publisher=book.publisher,
+        author=book.author,
+        pages=book.pages,
+        tags=tags,
+    )
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
     return db_book
 
 
-def create_book(db: Session, book: schemas.BookCreate):
-    db_book = Book(**book.dict())
-    try:
-        db.add(db_book)
-        db.commit()
-    except IntegrityError:
-        raise BookAlreadyExistError()
-    else:
-        db.refresh(db_book)
-        return db_book
+def update_book(db: Session, book_id: int, book: BookCreate):
+    db_book = get_book_by_id(db, book_id)
 
-
-def update_book(db: Session, book_id: int, book: schemas.BookCreate):
-    try:
-        db_book = get_book_by_id(db, book_id)
-    except BookNotFoundError:
+    if db_book is None:
         return create_book(db, book)
-    else:
-        db.execute(update(Book).where(Book.id == db_book.id).values(**book.dict()))
-        db.commit()
-        db.refresh(db_book)
-        return db_book
+
+    db.execute(
+        update(Book)
+        .where(Book.id == db_book.id)
+        .values(
+            title=book.title,
+            publisher=book.publisher,
+            author=book.author,
+            pages=book.pages,
+        )
+    )
+    tags = [get_or_create_tag(db, tag.name) for tag in book.tags]
+    db_book.tags.extend(tags)
+
+    db.commit()
+    db.refresh(db_book)
+    return db_book
 
 
 def delete_book(db: Session, book_id: int):
     db_book = get_book_by_id(db, book_id)
+    if db_book is None:
+        return None
     db.delete(db_book)
     db.commit()
+    return "Deleted!"

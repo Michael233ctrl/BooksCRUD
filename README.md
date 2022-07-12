@@ -13,16 +13,19 @@ TEST_POSTGRES_DB=<db_for_tests>
 ```
 
 #### Build project:
-
-- make build
+```shell
+make build
+```
 
 #### Run project:
-
-- make up
+```shell
+make up
+```
 
 #### Run tests:
-
-- docker-compose run web python -m pytest tests/
+```shell
+make test
+```
 
 #### API endpoints
 ```angular2html

@@ -6,6 +6,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from models import User, Book, Tag, BookTags
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -25,7 +27,7 @@ target_metadata = Base.metadata
 def get_url():
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD", "postgres")
-    server = os.getenv("POSTGRES_SERVER", "0.0.0.0")
+    server = os.getenv("POSTGRES_SERVER", "db")
     db = os.getenv("POSTGRES_DB", "books_db")
     return f"postgresql://{user}:{password}@{server}/{db}"
 
@@ -77,9 +79,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

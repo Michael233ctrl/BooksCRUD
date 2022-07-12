@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic import EmailStr
 
 
 class UserCreate(BaseModel):
-    username: str
-    email: EmailStr
-    password: str
+    username: str = Field(description="Username")
+    email: EmailStr = Field(description="User email")
+    password: str = Field(description="User password")
 
 
 class ShowUser(BaseModel):
-    username: str
-    email: EmailStr
-    is_active: bool
+    username: str = Field(description="Username")
+    email: EmailStr = Field(description="User email")
+    is_active: bool = Field(default=True)
 
     class Config:
         orm_mode = True
