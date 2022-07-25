@@ -7,7 +7,7 @@ from models.user import User
 
 def user_authentication_headers(*, client: TestClient, username: str) -> Dict[str, str]:
     data = {"username": username, "password": "john123"}
-    r = client.post(f"/login/token", data=data)
+    r = client.post(f"/users/login", data=data)
     response = r.json()
     auth_token = response["access_token"]
     headers = {"Authorization": f"Bearer {auth_token}"}

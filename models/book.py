@@ -23,5 +23,5 @@ class BookTags(Base):
     __tablename__ = "book_tags"
 
     id = Column(Integer, primary_key=True)
-    book_id = Column(Integer, ForeignKey("book.id"))
-    tag_id = Column(Integer, ForeignKey("tag.id"))
+    book_id = Column(Integer, ForeignKey("book.id", ondelete="SET NULL"))
+    tag_id = Column(Integer, ForeignKey("tag.id", ondelete="SET NULL"))

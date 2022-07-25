@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from api.base import api_router
+from api.endpoints.api import api_router
 from core.config import settings
 from db.base import Base
 from db.session import get_db
