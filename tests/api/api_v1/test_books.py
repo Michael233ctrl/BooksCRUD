@@ -50,4 +50,4 @@ def test_delete_book_tags(client: TestClient, user_token):
     response = client.delete("/books/2/tags/", headers=user_token, json={"tagId": 1})
     assert response.status_code == status.HTTP_204_NO_CONTENT
     response = client.get("/books/2", headers=user_token)
-    assert response.json()['tags'] == []
+    assert response.json()["tags"] == []
