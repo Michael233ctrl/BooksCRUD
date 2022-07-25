@@ -4,9 +4,10 @@ from starlette import status
 
 from api.deps import get_token
 from db.session import get_db
-from schemas.book import BookSchema, BookCreate
+from schemas.book import BookSchema, BookCreate, TagRequestBody
 from service import BookService
 from utils.service_result import handle_result
+
 
 router = APIRouter(dependencies=[Depends(get_token)])
 
@@ -34,3 +35,12 @@ def update_books(book: BookCreate, book_id: int, db: Session = Depends(get_db)):
 @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_books(book_id: int, db: Session = Depends(get_db)):
     return handle_result(result=BookService(db).delete_book(book_id))
+
+
+@router.delete("/{book_id}/tags/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_book_tags(
+    request_body: TagRequestBody, book_id: int, db: Session = Depends(get_db)
+):
+    return handle_result(
+        result=BookService(db).delete_book_tags(book_id, request_body.tagId)
+    )

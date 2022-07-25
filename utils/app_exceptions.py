@@ -99,11 +99,18 @@ class AppException:
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             AppExceptionCase.__init__(self, status_code, context)
 
+    class TagGet(AppExceptionCase):
+        def __init__(self, context: dict = None):
+            """
+            Tag not found
+            """
+            status_code = status.HTTP_404_NOT_FOUND
+            AppExceptionCase.__init__(self, status_code, context)
 
-class BookGet(AppExceptionCase):
-    def __init__(self, context: dict = None):
-        """
-        Book not found
-        """
-        status_code = status.HTTP_404_NOT_FOUND
-        AppExceptionCase.__init__(self, status_code, context)
+    class TagUpdate(AppExceptionCase):
+        def __init__(self, context: dict = None):
+            """
+            Tag update failed
+            """
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            AppExceptionCase.__init__(self, status_code, context)

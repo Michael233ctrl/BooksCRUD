@@ -1,7 +1,8 @@
-from sqlalchemy import and_
+from sqlalchemy import update
 
 import models
 import utils
+import schemas
 
 
 class TagCRUD(utils.AppCRUD):
@@ -24,17 +25,18 @@ class TagCRUD(utils.AppCRUD):
         self.db.refresh(tag_db)
         return tag_db
 
-    def delete_tag_for_book(self, book_id: int, tag_id: int):
-        query = (
-            self.db.query(models.BookTags)
-            .where(
-                and_(
-                    models.BookTags.book_id == book_id, models.BookTags.tag_id == tag_id
-                )
-            )
-            .one_or_none()
+    def update_tag(self, tag_id: int, tag: schemas.TagCreate):
+        self.db.execute(
+            update(models.Tag).where(models.Tag.id == tag_id).values(name=tag.name)
         )
-        if query is None:
+        tag_db = self.get_tag_by_id(tag_id)
+        self.db.commit()
+        self.db.refresh(tag_db)
+        return tag_db
+
+    def delete_tag(self, tag_id: int):
+        tag_db = self.get_tag_by_id(tag_id)
+        if tag_db is None:
             return True
-        self.db.delete(query)
+        self.db.delete(tag_db)
         self.db.commit()

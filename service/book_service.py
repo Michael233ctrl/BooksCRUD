@@ -50,3 +50,8 @@ class BookService(utils.AppService):
                 utils.AppException.BookGet(context={"id": book_id})
             )
         return utils.ServiceResult("Success!")
+
+    def delete_book_tags(self, book_id: int, tag_id: int) -> utils.ServiceResult:
+        if crud.BookCRUD(self.db).delete_book_tags(book_id, tag_id):
+            return utils.ServiceResult(utils.AppException.BookTagDoesNotExist())
+        return utils.ServiceResult("Success!")

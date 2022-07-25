@@ -1,5 +1,5 @@
 from sqlalchemy.orm import joinedload
-from sqlalchemy import update
+from sqlalchemy import update, and_
 
 import models
 import schemas
@@ -59,4 +59,19 @@ class BookCRUD(utils.AppCRUD):
         if db_book is None:
             return True
         self.db.delete(db_book)
+        self.db.commit()
+
+    def delete_book_tags(self, book_id: int, tag_id: int):
+        query = (
+            self.db.query(models.BookTags)
+            .where(
+                and_(
+                    models.BookTags.book_id == book_id, models.BookTags.tag_id == tag_id
+                )
+            )
+            .one_or_none()
+        )
+        if query is None:
+            return True
+        self.db.delete(query)
         self.db.commit()
