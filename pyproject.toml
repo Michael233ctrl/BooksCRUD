@@ -18,6 +18,7 @@ python-multipart = "^0.0.5"
 pytest = "^7.1.2"
 requests = "^2.28.0"
 black = "^22.6.0"
+asyncpg = "^0.26.0"
 
 [tool.poetry.dev-dependencies]
 

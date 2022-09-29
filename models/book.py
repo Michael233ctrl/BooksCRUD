@@ -12,7 +12,9 @@ class Book(Base):
     publisher = Column(String, index=True, nullable=False)
     author = Column(String, nullable=False)
     pages = Column(String)
-    tags = relationship("Tag", secondary="book_tags", back_populates="books")
+    tags = relationship(
+        "Tag", secondary="book_tags", back_populates="books", lazy="joined"
+    )
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(
         DateTime(timezone=True), onupdate=datetime.utcnow, default=datetime.utcnow

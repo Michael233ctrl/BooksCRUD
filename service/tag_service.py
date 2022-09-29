@@ -4,7 +4,7 @@ import schemas
 
 
 class TagService(utils.AppService):
-    def get_tags(self) -> utils.ServiceResult:
+    async def get_tags(self) -> utils.ServiceResult:
         tags_db = crud.TagCRUD(self.db).get_tags()
         return utils.ServiceResult(tags_db)
 

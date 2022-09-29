@@ -22,6 +22,11 @@ make build
 make up
 ```
 
+#### Apply migrations:
+```shell
+docker-compose exec web alembic upgrade head
+```
+
 #### Run tests:
 ```shell
 make test

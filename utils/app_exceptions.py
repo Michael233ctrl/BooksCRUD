@@ -16,7 +16,7 @@ class AppExceptionCase(Exception):
         )
 
 
-async def app_exception_handler(request: Request, exc: AppExceptionCase):
+async def app_exception_handler(_: Request, exc: AppExceptionCase):
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -113,4 +113,12 @@ class AppException:
             Tag update failed
             """
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            AppExceptionCase.__init__(self, status_code, context)
+
+    class TokenExpiredError(AppExceptionCase):
+        def __init__(self, context: dict = None):
+            """
+            Token expired
+            """
+            status_code = status.HTTP_401_UNAUTHORIZED
             AppExceptionCase.__init__(self, status_code, context)

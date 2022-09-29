@@ -1,27 +1,33 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 import schemas
 import utils
 import crud
 
 
 class BookService(utils.AppService):
-    def get_books(self) -> utils.ServiceResult:
-        book_db = crud.BookCRUD(self.db).get_books()
-        return utils.ServiceResult(book_db)
+    def __init__(self, db: AsyncSession):
+        super().__init__(db)
+        self.book_service = crud.BookCRUD(db)
 
-    def get_book_by_id(self, book_id: int) -> utils.ServiceResult:
-        if not (book_db := crud.BookCRUD(self.db).get_book_by_id(book_id)):
+    async def get_books(self) -> utils.ServiceResult:
+        books_db = await self.book_service.get_books()
+        return utils.ServiceResult(books_db)
+
+    async def get_book_by_id(self, book_id: int) -> utils.ServiceResult:
+        if not (
+            book_db := self.book_service.get_book_by_field(field="id", data=book_id)
+        ):
             return utils.ServiceResult(
                 utils.AppException.BookGet(context={"id": book_id})
             )
         return utils.ServiceResult(book_db)
 
-    def create_book(self, book: schemas.BookCreate) -> utils.ServiceResult:
-        if crud.BookCRUD(self.db).get_book_by_title(book.title):
+    async def create_book(self, book: schemas.BookCreate) -> utils.ServiceResult:
+        if not (book_db := await self.book_service.create_book(book)):
             return utils.ServiceResult(
                 utils.AppException.BookAlreadyExists(context={"title": book.title})
             )
-        if not (book_db := crud.BookCRUD(self.db).create_book(book)):
-            return utils.ServiceResult(utils.AppException.BookCreate())
         return utils.ServiceResult(book_db)
 
     def update_book(
