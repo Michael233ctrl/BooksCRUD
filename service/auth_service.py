@@ -17,10 +17,8 @@ class AuthService:
 
     async def verify_password(self, plain_password, hashed_password):
         if not self.hasher.verify(plain_password, hashed_password):
-            return utils.ServiceResult(
-                utils.AppException.UserUnauthorized(
-                    context={"message": "Incorrect password or username"}
-                )
+            raise utils.AppException.UserUnauthorized(
+                context={"message": "Incorrect password or username"}
             )
 
     async def get_password_hash(self, password):
@@ -45,10 +43,8 @@ class AuthService:
             payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
             return schemas.TokenPayload(**payload)
         except (JWTError, ValidationError):
-            return utils.ServiceResult(
-                utils.AppException.TokenExpiredError(
-                    context={"message": "Could not validate credentials"}
-                )
+            raise utils.AppException.TokenExpiredError(
+                context={"message": "Could not validate credentials"}
             )
 
     async def create_token(self, username: str):
@@ -67,3 +63,7 @@ class AuthService:
             "refresh_token": refresh_token,
             "token_type": "bearer",
         }
+
+    async def refresh_token(self, token: schemas.TokenRefresh):
+        token = await self.decode_token(token.refresh_token)
+        return await self.create_token(username=token.sub)

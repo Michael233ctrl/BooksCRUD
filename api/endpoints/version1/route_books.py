@@ -2,46 +2,43 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from api.deps import get_token, get_db
-from schemas.book import BookSchema, BookCreate, TagRequestBody
+from api.deps import get_db, get_current_user
+from schemas.book import BookSchema, BookCreate
 from service import BookService
-from utils.service_result import handle_result
 
 
-router = APIRouter(dependencies=[Depends(get_token)])
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=list[BookSchema], status_code=status.HTTP_200_OK)
 async def read_books(db: AsyncSession = Depends(get_db)):
-    return handle_result(result=await BookService(db).get_books())
+    return await BookService(db).get_books()
 
 
 @router.get("/{book_id}", response_model=BookSchema, status_code=status.HTTP_200_OK)
 async def read_books_by_id(book_id: int, db: AsyncSession = Depends(get_db)):
-    return handle_result(result=await BookService(db).get_book_by_id(book_id))
+    return await BookService(db).get_book_by_id(book_id)
 
 
 @router.post("/", response_model=BookSchema, status_code=status.HTTP_201_CREATED)
 async def create_books(book: BookCreate, db: AsyncSession = Depends(get_db)):
-    return handle_result(result=await BookService(db).create_book(book))
+    return await BookService(db).create_book(book)
 
 
-@router.put("/{book_id}", response_model=BookSchema, status_code=status.HTTP_200_OK)
-async def update_books(
-    book: BookCreate, book_id: int, db: AsyncSession = Depends(get_db)
-):
-    return handle_result(result=BookService(db).update_book(book_id, book))
-
-
-@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_books(book_id: int, db: AsyncSession = Depends(get_db)):
-    return handle_result(result=BookService(db).delete_book(book_id))
-
-
-@router.delete("/{book_id}/tags/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_book_tags(
-    request_body: TagRequestBody, book_id: int, db: AsyncSession = Depends(get_db)
-):
-    return handle_result(
-        result=BookService(db).delete_book_tags(book_id, request_body.tagId)
-    )
+# @router.put("/{book_id}", response_model=BookSchema, status_code=status.HTTP_200_OK)
+# async def update_books(
+#     book: BookCreate, book_id: int, db: AsyncSession = Depends(get_db)
+# ):
+#     return BookService(db).update_book(book_id, book)
+#
+#
+# @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+# async def delete_books(book_id: int, db: AsyncSession = Depends(get_db)):
+#     return BookService(db).delete_book(book_id)
+#
+#
+# @router.delete("/{book_id}/tags/", status_code=status.HTTP_204_NO_CONTENT)
+# async def delete_book_tags(
+#     request_body: TagRequestBody, book_id: int, db: AsyncSession = Depends(get_db)
+# ):
+#     return BookService(db).delete_book_tags(book_id, request_body.tagId)
