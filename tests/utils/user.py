@@ -1,8 +1,8 @@
 from typing import Dict
 from starlette.testclient import TestClient
 
-from core.hashing import Hasher
 from models.user import User
+from service import AuthService
 
 
 def user_authentication_headers(*, client: TestClient, username: str) -> Dict[str, str]:
@@ -15,10 +15,9 @@ def user_authentication_headers(*, client: TestClient, username: str) -> Dict[st
 
 
 def create_dummy_user(db_session) -> User:
+    hashed_password = (await AuthService().get_password_hash("john123"),)
     user = User(
-        username="John",
-        email="john@gmail.com",
-        hashed_password=Hasher.get_password_hash("john123"),
+        username="John", email="john@gmail.com", hashed_password=hashed_password
     )
     db_session.add(user)
     db_session.commit()

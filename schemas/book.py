@@ -37,6 +37,20 @@ class TagSchema(TagBase):
     books: List[BookBase]
 
 
+# class BookListSchema(BaseModel):
+#     __root__: List[BookBase] = []
+#
+#     class Config:
+#         orm_mode = True
+#
+#
+# class TagListSchema(BaseModel):
+#     __root__: List[TagBase]
+#
+#     class Config:
+#         orm_mode = True
+
+
 class TagCreate(BaseModel):
     name: str = Field(description="Tag title")
 
@@ -53,3 +67,7 @@ class BookCreate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class BookUpdate(BookCreate):
+    ...

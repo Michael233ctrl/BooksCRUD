@@ -8,4 +8,6 @@ class Tag(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, unique=True)
-    books = relationship("Book", secondary="book_tags", back_populates="tags")
+    books = relationship(
+        "Book", secondary="book_tags", back_populates="tags", lazy="joined"
+    )
