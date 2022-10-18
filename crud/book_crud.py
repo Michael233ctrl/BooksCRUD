@@ -1,6 +1,4 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 
 import schemas
 from models import Book
@@ -25,7 +23,7 @@ class BookCRUD(BaseCRUD):
 
         tag_crud = TagCRUD(self.db)
         book.tags = [await tag_crud.get_or_create_tag(tag.name) for tag in book.tags]
-        return book.dict(exclude_unset=True)
+        return book
 
     async def create_book(self, book: schemas.BookCreate):
         cleaned_data = await self.__book_cleaned_data(book)

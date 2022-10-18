@@ -1,5 +1,6 @@
-from typing import Union, TypeVar, Generic
+from typing import Union, TypeVar, Generic, Dict, Any, List
 
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -18,11 +19,13 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType], utils.App
         super().__init__(db)
         self.model = model
 
-    async def _get_all_objects(self, opt=None):
+    async def _get_all_objects(self, opt=None) -> List[ModelType]:
         queryset = await self.db.execute(select(self.model).options(selectinload(opt)))
         return queryset.scalars().all()
 
-    async def _get_object_by_field(self, field: str, data: Union[str, int], opt=None):
+    async def _get_object_by_field(
+        self, field: str, data: Union[str, int], opt=None
+    ) -> ModelType:
         if hasattr(self.model, field):
             queryset = await self.db.execute(
                 select(self.model)
@@ -33,25 +36,19 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType], utils.App
         else:
             raise AttributeError(f"{self.model} model has no attribute {field}")
 
-    async def __check_model_attrs(self, obj_in: dict):
-        # if isinstance(obj_in, dict) and all(attr for attr in obj_in if hasattr(self.model, attr)):
-        #     cleaned_data = obj_in
-        if not all(attr for attr in obj_in if hasattr(self.model, attr)):
-            raise AttributeError(
-                f"Data doesn't correspond {self.model} model attributes"
-            )
-
-    async def _create(self, cleaned_data: dict):
-        await self.__check_model_attrs(cleaned_data)
-        obj_to_create = self.model(**cleaned_data)
+    async def _create(self, obj_in: CreateSchemaType) -> ModelType:
+        obj_in_data = await self.__cleaned_data(obj_in)
+        obj_to_create = self.model(**obj_in_data)
         self.db.add(obj_to_create)
         await self.db.commit()
         await self.db.refresh(obj_to_create)
         return obj_to_create
 
-    async def _update(self, obj_to_update, cleaned_data: dict):
-        await self.__check_model_attrs(cleaned_data)
-        for key, value in cleaned_data.items():
+    async def _update(
+        self, obj_to_update: ModelType, obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+    ) -> ModelType:
+        obj_in_data = await self.__cleaned_data(obj_in)
+        for key, value in obj_in_data.items():
             setattr(obj_to_update, key, value)
 
         self.db.add(obj_to_update)
@@ -62,3 +59,11 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType], utils.App
     async def _delete(self, obj_to_delete):
         await self.db.delete(obj_to_delete)
         await self.db.commit()
+
+    async def __cleaned_data(self, obj_in: CreateSchemaType):
+        encode_data = jsonable_encoder(obj_in)
+        if not all(attr for attr in encode_data if hasattr(self.model, attr)):
+            raise AttributeError(
+                f"Data doesn't correspond {self.model} model attributes"
+            )
+        return encode_data

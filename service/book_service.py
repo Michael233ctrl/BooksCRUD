@@ -14,7 +14,7 @@ class BookService(utils.AppService):
         return await self.book_crud.get_books()
 
     async def get_book_by_id(self, book_id: int):
-        if not (book_db := await self.book_crud.get_book_by_id(book_id=book_id)):
+        if not (book_db := await self.book_crud.get_book_by_id(book_id)):
             raise utils.AppException.BookGet(context={"id": book_id})
         return book_db
 
