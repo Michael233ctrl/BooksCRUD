@@ -1,19 +1,33 @@
+DOCKER_COMPOSE_LEGACY := $(shell docker-compose --version 2> /dev/null)
+DOCKER_COMPOSE := $(shell docker compose version && echo "new client detected" 2> /dev/null)
+
+ifdef DOCKER_COMPOSE_LEGACY
+DOCKER_COMPOSE_PATH := docker-compose
+else
+ifdef DOCKER_COMPOSE
+DOCKER_COMPOSE_PATH := docker compose
+else
+$(error "no docker-compose executable found")
+endif
+endif
+
+
 restart: down up
 
 up:
-	docker-compose up -d
+	$(DOCKER_COMPOSE_PATH) up -d
 
 down:
-	docker-compose down
+	$(DOCKER_COMPOSE_PATH) down
 
 build:
-	docker-compose build
+	$(DOCKER_COMPOSE_PATH) build
 
 test:
-	docker-compose run web pytest
+	$(DOCKER_COMPOSE_PATH) run web pytest
 
 migrate:
-	docker-compose exec web alembic upgrade head
+	$(DOCKER_COMPOSE_PATH) exec web alembic upgrade head
 
 migrations:
-	docker-compose exec web alembic revision
+	$(DOCKER_COMPOSE_PATH) exec web alembic revision
